@@ -1,21 +1,33 @@
-pipeline {
-    agent any
+node {
 
-    stages {
+    def baseGitRepo = 'git@github.com:mano-organization/microservice-repo-1.git'
+    def gitCredentialsId = 'b70fe5f4-8191-4f7c-9108-c3806c4050bf'
+    def upstreamBranch = 'master'
+
+    try {
+
+        stage('Prepare') {
+            // Get code from the git repository
+            git branch: upstreamBranch, credentialsId: gitCredentialsId, url: gitRepo
+        }
+
         stage('Build') {
-            steps {
-                echo 'Building..'
-            }
+
+            sh('echo "----> Building..."')
+           
         }
-        stage('Test') {
-            steps {
-                echo 'Testing..'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'Deploying....'
-            }
+
+      
+    catch (err) {
+
+        currentBuild.result = "FAILURE"
+        throw err
+    }
+
+    finally {
+
+        stage('Cleanup') {
+            sh('echo "All Done"')
         }
     }
 }
